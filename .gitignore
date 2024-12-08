@@ -1,13 +1,14 @@
 env
-**/*.pyc
+**/*.pyc    
 **/__pycache__
 media
 .DS_Store
 *.sqlite3
 *.env
+installed_packages.txt
 
 # Accept these files in the repository
 !.gitignore
 !.travis.yml
 /.env
-/.vscode
+.vscode

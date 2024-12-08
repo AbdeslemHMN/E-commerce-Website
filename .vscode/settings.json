@@ -9,5 +9,7 @@
   "python.linting.pycodestyleArgs": ["--ignore=E501"],
   "files.exclude": {
     "**/*.pyc": true
-  }
+  },
+  "cSpell.words": ["allauth"],
+  "CodeGPT.apiKey": "CodeGPT Plus Beta"
 }

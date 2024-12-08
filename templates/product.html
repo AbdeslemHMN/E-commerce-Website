@@ -1,0 +1,160 @@
+{% extends "base.html" %} 
+{% block content %}
+
+<main style="margin-top: 40px; padding-top: 20px">
+  <div
+    class="container"
+    style="max-width: 1200px; color: #333; font-family: Arial, sans-serif"
+  >
+    <!-- Product Section -->
+    <div
+      class="product-row"
+      style="
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 40px;
+      "
+    >
+      <!-- Product Image -->
+      <div class="product-image" style="text-align: center">
+        <img
+          src="https://mdbootstrap.com/img/Photos/Horizontal/E-commerce/Products/14.jpg"
+          alt="Product Image"
+          style="max-width: 100%; height: auto; border-radius: 8px"
+        />
+      </div>
+
+      <!-- Product Details -->
+      <div
+        class="product-details"
+        style="padding: 20px; background-color: #f9f9f9; border-radius: 8px"
+      >
+        <!-- Category Badge -->
+        <div style="margin-bottom: 15px">
+          <a
+            href="#"
+            style="
+              text-decoration: none;
+              color: white;
+              background-color: purple;
+              padding: 5px 10px;
+              border-radius: 5px;
+            "
+          >
+            {{ object.get_category_display }}
+          </a>
+        </div>
+
+        <!-- Price Section -->
+        <div style="margin-bottom: 20px; font-size: 1.5rem; font-weight: bold">
+          {% if object.discount_price %}
+          <span style="color: #999; text-decoration: line-through"
+            >${{ object.price }}</span
+          >
+          <span style="color: #28a745">${{ object.discount_price }}</span>
+          {% else %}
+          <span style="color: #333">${{ object.price }}</span>
+          {% endif %}
+        </div>
+
+        <!-- Description -->
+        <h3 style="margin-bottom: 10px">Description</h3>
+        <p style="line-height: 1.6; font-size: 1rem">
+          {{ object.description }}
+        </p>
+
+        <!-- Buttons -->
+        <div style="margin-top: 20px">
+          <a
+            href="{{ object.get_add_to_cart_url }}"
+            style="
+              display: inline-block;
+              padding: 10px 20px;
+              background-color: #007bff;
+              color: white;
+              text-decoration: none;
+              border-radius: 5px;
+              margin-right: 10px;
+            "
+          >
+            Add to cart
+          </a>
+          <a
+            href="{{ object.get_remove_from_cart_url }}"
+            style="
+              display: inline-block;
+              padding: 10px 20px;
+              background-color: #dc3545;
+              color: white;
+              text-decoration: none;
+              border-radius: 5px;
+            "
+          >
+            Remove from cart
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Additional Information -->
+    <div
+      class="additional-info"
+      style="text-align: center; margin-bottom: 40px"
+    >
+      <h4>Additional Information</h4>
+      <p
+        style="
+          line-height: 1.8;
+          font-size: 1rem;
+          max-width: 800px;
+          margin: 0 auto;
+          color: #555;
+        "
+      >
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus suscipit
+        modi sapiente illo soluta odit voluptates, quibusdam officia. Neque
+        quibusdam quas a quis porro? Molestias illo neque eum in laborum.
+      </p>
+    </div>
+
+    <!-- Related Products Section -->
+    <div
+      class="related-products"
+      style="
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+      "
+    >
+      <!-- Related Product 1 -->
+      <div style="border: 1px solid #ddd; padding: 10px; border-radius: 8px">
+        <img
+          src="https://mdbootstrap.com/img/Photos/Horizontal/E-commerce/Products/11.jpg"
+          alt="Related Product 1"
+          style="max-width: 100%; height: auto; border-radius: 8px"
+        />
+      </div>
+
+      <!-- Related Product 2 -->
+      <div style="border: 1px solid #ddd; padding: 10px; border-radius: 8px">
+        <img
+          src="https://mdbootstrap.com/img/Photos/Horizontal/E-commerce/Products/12.jpg"
+          alt="Related Product 2"
+          style="max-width: 100%; height: auto; border-radius: 8px"
+        />
+      </div>
+
+      <!-- Related Product 3 -->
+      <div style="border: 1px solid #ddd; padding: 10px; border-radius: 8px">
+        <img
+          src="https://mdbootstrap.com/img/Photos/Horizontal/E-commerce/Products/13.jpg"
+          alt="Related Product 3"
+          style="max-width: 100%; height: auto; border-radius: 8px"
+        />
+      </div>
+    </div>
+  </div>
+</main>
+
+{% endblock content %}
