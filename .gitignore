@@ -10,5 +10,5 @@ installed_packages.txt
 # Accept these files in the repository
 !.gitignore
 !.travis.yml
-/.env
+.env
 .vscode
