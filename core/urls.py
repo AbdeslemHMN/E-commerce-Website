@@ -6,6 +6,8 @@ from .views import (
     remove_from_cart , 
     OrderSummaryView , 
     delete_item_from_cart ,
+    CheckoutView , 
+    PaymentView , 
 )
 
 
@@ -19,4 +21,6 @@ urlpatterns = [
     path('remove_from_cart/<slug:slug>/',remove_from_cart , name='remove_from_cart'),
     path('order_summary/',OrderSummaryView.as_view(), name='order_summary'),
     path('delete_item/<slug:slug>/',delete_item_from_cart , name='delete_item_from_cart'),
+    path('checkout/',CheckoutView.as_view(), name='checkout'),
+    path('payment/<payment_option>/',PaymentView.as_view(), name='payment'),
 ]

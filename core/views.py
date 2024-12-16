@@ -1,7 +1,7 @@
 from django.shortcuts import render , get_object_or_404
 from django.views.generic import DetailView , ListView , View
 from django.shortcuts import redirect
-from .models import Item , Order , OrderItem
+from .models import Item , Order , OrderItem , BillingAddress
 from .forms import CheckoutForm
 from django.utils import timezone
 from django.contrib import messages
@@ -20,11 +20,42 @@ def products(request):
 
 class CheckoutView(View):
     def get(self, *args, **kwargs):
-        pass
+        form = CheckoutForm()
+        order = Order.objects.get(user = self.request.user , ordered = False)
+        context = {
+            'form' : form ,
+            'order' : order
+        }
+        return render(self.request, 'checkout.html', context) 
         
     def post(self, *args, **kwargs):
-        pass
-        
+        form = CheckoutForm(self.request.POST or None)
+        try : 
+            
+            if form.is_valid():
+                street_address = form.cleaned_data.get('street_address')
+                apartment_address = form.cleaned_data.get('apartment_address')
+                shipping_country = form.cleaned_data.get('shipping_country')
+                billing_country = form.cleaned_data.get('billing_country')
+                shipping_zip = form.cleaned_data.get('shipping_zip')
+                billing_zip = form.cleaned_data.get('billing_zip')
+                # same_shipping_address = form.cleaned_data.get('same_billing_address')
+                # save_info = form.cleaned_data.get('save_info')
+                payment_option = form.cleaned_data.get('payment_option')
+                billing_address = BillingAddress(
+                    user = self.request.user,
+                    street_address = street_address,
+                    apartment_address = apartment_address,
+                    zip = shipping_zip,
+                    country = shipping_country
+                    )
+                billing_address.save()
+                order.billing_address = billing_address
+                order.save()
+            return redirect('core:payment')
+        except ObjectDoesNotExist:
+            messages.error(self.request, 'You have not placed any order yet')
+            return redirect('core:checkout')
 
 class HomeView(ListView):
     model = Item
@@ -35,7 +66,15 @@ class ItemDetailView(DetailView):
     model = Item
     template_name = 'product.html'
 
-
+class PaymentView(View):
+    def get(self , *args , **kwargs):
+        order = Order.objects.get(user = self.request.user , ordered = False)
+        context = {
+            'order' : order
+        }
+        return render(self.request , 'payment.html', context)
+    
+    
 class OrderSummaryView(LoginRequiredMixin,View):
     def get(self , *args , **kwargs):
         try:
@@ -45,7 +84,7 @@ class OrderSummaryView(LoginRequiredMixin,View):
             }
             return render(self.request , 'order_summary.html' , context)
         except ObjectDoesNotExist:
-            messages.error(self.request , 'You have not placed any order yet')
+            messages.warning(self.request , 'You have not placed any order yet')
             return redirect('/')
 
 

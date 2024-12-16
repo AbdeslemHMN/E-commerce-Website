@@ -8,12 +8,28 @@ PAYMENT_CHOICES = (
 )
 
 class CheckoutForm(forms.Form):
-    street_address = forms.CharField()
-    apartment_address = forms.CharField(required=False)
-    country = CountryField(blank_label='(select country)').formfield(
-        widget=CountrySelectWidget()
+    street_address = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'placeholder': '1234 Main St'
+                                        }))
+    apartment_address = forms.CharField(required=False ,
+                                            widget=forms.TextInput(attrs={
+                                                'placeholder': 'Apartment or suite'
+                                                                            }))
+    shipping_country = CountryField(blank_label='(select country)').formfield(
+        required=False,
+        widget=CountrySelectWidget(
+            attrs = { 'class' : 'custom-select d-block w-100' }
+        )
     )
-    zip = forms.CharField()
-    same_billing_address = forms.BooleanField(widget=forms.CheckboxInput())
+    billing_country = CountryField(blank_label='(select country)').formfield(
+        required=False,
+        widget=CountrySelectWidget(
+            attrs = { 'class' : 'custom-select d-block w-100' }
+        )
+    )
+    shipping_zip = forms.CharField()
+    billing_zip = forms.CharField()
+    same_shipping_address = forms.BooleanField(widget=forms.CheckboxInput())
     save_info = forms.BooleanField(widget=forms.CheckboxInput())
     payment_option = forms.ChoiceField(widget=forms.RadioSelect, choices=PAYMENT_CHOICES)
