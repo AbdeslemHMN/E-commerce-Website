@@ -36,7 +36,7 @@
                             <span class="badge badge-primary">Saving ${{ order_item.get_amount_saved }}</span>
                             {% else %}
                 ${{ order_item.get_total_item_price }}
-            {% endif %}
+                            {% endif %}
                             <a style="color: red;" href="{% url 'core:delete_item_from_cart' order_item.item.slug %}">
                                 <i class="fas fa-trash float-right"></i>
                             </a>

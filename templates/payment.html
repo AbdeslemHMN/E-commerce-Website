@@ -60,7 +60,10 @@ button:hover {
   margin-bottom: 5px;
 }
 
-
+/**
+ * The CSS shown here will not be introduced in the Quickstart guide, but shows
+ * how you can use CSS to style your Element's container.
+ */
 .StripeElement {
   box-sizing: border-box;
 
@@ -113,9 +116,8 @@ button:hover {
                 <div class="custom-control custom-checkbox">
                   <input type="checkbox" class="custom-control-input" name="use_default_card" id="use_default_card">
                   <label class="custom-control-label" for="use_default_card">Use default card:
-                    **** **** ****
-                    <!-- {{ card.last4 }}  -->
-                  <!-- <span>Exp: {{ card.exp_month }}/{{ card.exp_year }}</span></label> -->
+                    **** **** **** {{ card.last4 }} 
+                  <span>Exp: {{ card.exp_month }}/{{ card.exp_year }}</span></label>
                 </div>
               </div>
             {% endif %}
@@ -155,8 +157,11 @@ button:hover {
 
           </div>
         </div>
+
         {% include "order_snippet.html" %}
+
       </div>
+
     </div>
   </main>
 
@@ -165,7 +170,7 @@ button:hover {
 {% block extra_scripts %}
 
 <script src="https://js.stripe.com/v3/"></script>
-<!-- <script nonce="">  // Create a Stripe client.
+<script nonce="">  // Create a Stripe client.
   var stripe = Stripe('{{STRIPE_PUBLIC_KEY}}');
 
   // Create an instance of Elements.
@@ -236,20 +241,9 @@ button:hover {
     form.submit();
   }
 
-  var currentCardForm = $('.current-card-form');
-  var newCardForm = $('.new-card-form');
-  var use_default_card = document.querySelector("input[name=use_default_card]");
-  use_default_card.addEventListener('change', function() {
-    if (this.checked) {
-      newCardForm.hide();
-      currentCardForm.show()
-    } else {
-      newCardForm.show();
-      currentCardForm.hide()
-    }
-  })
+  
 
-</script> -->
+</script>
 
 {% endblock extra_scripts %}
 

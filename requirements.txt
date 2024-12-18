@@ -4,3 +4,4 @@ pep8>=1.7.1          # Deprecated; replaced by pycodestyle
 pycodestyle>=2.11.0  # Updated for modern PEP 8 checks
 pytz>=2023.3         # Updated for current timezone data
 sqlparse>=0.4.4      # Updated for compatibility with Django 5.1.4
+stripe>=11.3.0

@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path ,re_path
 from .views import (
     HomeView,
     ItemDetailView , 
@@ -22,5 +22,7 @@ urlpatterns = [
     path('order_summary/',OrderSummaryView.as_view(), name='order_summary'),
     path('delete_item/<slug:slug>/',delete_item_from_cart , name='delete_item_from_cart'),
     path('checkout/',CheckoutView.as_view(), name='checkout'),
-    path('payment/<payment_option>/',PaymentView.as_view(), name='payment'),
+    re_path(r'^payment/(?P<payment_option>(stripe|paypal))/$', PaymentView.as_view(), name='payment'),
+
+
 ]
