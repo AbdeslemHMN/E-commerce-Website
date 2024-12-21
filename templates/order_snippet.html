@@ -27,9 +27,8 @@
         <strong>${{ order.get_total }}</strong>
     </li>
     </ul>
-
     {% if DISPLAY_COUPON_FORM %}
-    <form class="card p-2" action="{% url 'core:add-coupon' %}" method="POST">
+    <form class="card p-2" action="{% url 'core:add_coupon' %}" method="POST">
         {% csrf_token %}
         <div class="input-group">
             {{ couponform.code }}
@@ -39,6 +38,12 @@
         </div>
     </form>
     {% endif %}
+    {% if order.coupon and DISPLAY_COUPON_FORM %}
+    <form class="mt-3" action="{% url 'core:delete_coupon' %}" method="POST">
+        {% csrf_token %}
+        <button class="btn btn-danger btn-md waves-effect m-0" type="submit">Remove Coupon</button>
+    </form>
+{% endif %}
 
 </div>
 

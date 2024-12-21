@@ -1,8 +1,9 @@
 from django.shortcuts import render , get_object_or_404
+from django.http import Http404
 from django.views.generic import DetailView , ListView , View
 from django.shortcuts import redirect
-from .models import Item , Order , OrderItem , BillingAddress , Payment
-from .forms import CheckoutForm
+from .models import Item , Order , OrderItem , BillingAddress , Payment , Coupon
+from .forms import CheckoutForm , CouponForm
 from django.utils import timezone
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
@@ -10,6 +11,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.conf import settings
 import stripe
+
+# cSpell:ignore REFERER
+
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -23,13 +27,19 @@ def products(request):
 
 class CheckoutView(View):
     def get(self, *args, **kwargs):
-        form = CheckoutForm()
-        order = Order.objects.get(user = self.request.user , ordered = False)
-        context = {
-            'form' : form ,
-            'order' : order
-        }
-        return render(self.request, 'checkout.html', context) 
+        try:
+            form = CheckoutForm()
+            order = Order.objects.get(user = self.request.user , ordered = False)
+            context = {
+                'form' : form ,
+                'couponform' : CouponForm() ,
+                'order' : order , 
+                "DISPLAY_COUPON_FORM" : True
+            }
+            return render(self.request, 'checkout.html', context) 
+        except ObjectDoesNotExist:
+            messages.warning(self.request, 'You have not placed any order yet')
+            return redirect('core:checkout')
         
     def post(self, *args, **kwargs):
         form = CheckoutForm(self.request.POST or None)
@@ -90,11 +100,16 @@ class ItemDetailView(DetailView):
 class PaymentView(View):  
     def get(self , *args , **kwargs):
         order = Order.objects.get(user = self.request.user , ordered = False)
-        context = {
-            'order' : order ,
-            'STRIPE_PUBLIC_KEY' : settings.STRIPE_PUBLIC_KEY
-        }
-        return render(self.request , 'payment.html', context)
+        if order.billing_address:
+            context = {
+                'order' : order ,
+                'STRIPE_PUBLIC_KEY' : settings.STRIPE_PUBLIC_KEY ,
+                "DISPLAY_PAYMENT_FORM" : False
+            }
+            return render(self.request , 'payment.html', context)
+        else:
+            messages.warning(self.request , 'Please add your billing address')
+            return redirect('core:checkout')
     
     def post(self , *args , **kwargs):
         token = self.request.POST.get('stripeToken')
@@ -174,7 +189,7 @@ def add_to_cart(request, slug):
     # Get the item to add to the cart
     item = get_object_or_404(Item, slug=slug)
 
-    # Check if an order item for this item already exists in the current order
+    # Check if an order already exists in the current order
     order_qs = Order.objects.filter(user=request.user, ordered=False)
     if order_qs.exists():
         order = order_qs[0]
@@ -255,3 +270,75 @@ def delete_item_from_cart(request, slug):
 
     return redirect(request.META.get('HTTP_REFERER', '/'))
     
+
+def get_coupon(code):
+    try:
+        return Coupon.objects.get(code=code)
+    except Coupon.DoesNotExist:
+        return None
+
+
+class AddCouponView(View):
+    def post(self , *args , **kwargs):
+            form = CouponForm(self.request.POST or None)
+            user = self.request.user
+            if form.is_valid() and user.is_authenticated:
+                try:
+                    code = form.cleaned_data.get('code')
+                    order = Order.objects.get(user=user, ordered=False)
+                    coupon = get_coupon(code)
+                    if coupon:
+                        if coupon.user == user and coupon.couponUsed:
+                            raise ValueError("This coupon has already been used.")
+                        coupon.user = user
+                        coupon.couponUsed = True
+                        coupon.save()
+                        order.coupon = coupon
+                        order.save()
+                        messages.success(self.request, 'Coupon code was added to your cart.')
+                    else:
+                        raise Http404("This coupon does not exist.")
+                    return redirect('core:checkout')
+                except ObjectDoesNotExist:
+                    messages.warning(self.request, 'You have not placed any order yet.')
+                    return redirect('core:checkout')
+                except ValueError as e:
+                    messages.warning(self.request, str(e))
+                    return redirect('core:checkout')
+                except Exception as e:
+                    messages.error(self.request, f"{str(e)}")
+                    return redirect('core:checkout')
+            else:
+                messages.error(self.request, 'Invalid form submission. Please try again.')
+                return redirect('core:checkout')
+    
+class DeleteCouponView(View):
+        def post(self , *args , **kwargs):
+            user = self.request.user
+            if user.is_authenticated:
+                try:
+                    order = Order.objects.get(user=user, ordered=False)
+                    if not order.coupon:
+                        raise ValueError("No coupon is applied to the current order.")
+                    coupon = order.coupon
+                    if coupon.user == user and coupon.couponUsed:
+                        coupon.couponUsed = False
+                        coupon.save()
+                        order.coupon = None
+                        order.save()
+                        messages.success(self.request, 'Coupon code was removed.')
+                    else:
+                        raise ValueError("This coupon is not valid or not used.")
+                    return redirect('core:checkout')
+                except ObjectDoesNotExist:
+                    messages.warning(self.request, 'You have not placed any order yet.')
+                    return redirect('core:checkout')
+                except ValueError as e:
+                    messages.warning(self.request, str(e))
+                    return redirect('core:checkout')
+                except Exception as e:
+                    messages.error(self.request, f"{str(e)}")
+                    return redirect('core:checkout')
+            else:
+                messages.error(self.request, 'You need to be logged in to perform this action.')
+                return redirect('core:checkout')
