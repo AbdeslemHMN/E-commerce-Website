@@ -12,45 +12,38 @@
             {% csrf_token %}
 
             <h3>Shipping address</h3>
-            <div class='hideable_shipping_form'>
+
+            <div class="hideable_shipping_form">
               <div class="md-form mb-5">
-                {{ form.street_address }}
-                <label for="{{ form.street_address.id_for_label }}">Address</label>
+                <input type="text" placeholder="1234 Main St" id="shipping_address" name="shipping_address" class="form-control" />
+                <label for="shipping_address" class="">Address</label>
               </div>
 
               <div class="md-form mb-5">
-                {{ form.apartment_address }}
-                <label for="{{ form.apartment_address.id_for_label }}">Address 2 (optional)</label>
+                <input type="text" placeholder="Apartment or suite" id="shipping_address2" name="shipping_address2" class="form-control" />
+                <label for="shipping_address2" class="">Address 2 (optional)</label>
               </div>
 
               <div class="row">
                 <div class="col-lg-4 col-md-12 mb-4">
-                  <label for="shipping_country">Country</label>
+                  <label for="country">Country</label>
                   {{ form.shipping_country }}
-                  <div class="invalid-feedback">
-                    Please select a valid country.
-                  </div>
+                  <div class="invalid-feedback">Please select a valid country.</div>
                 </div>
                 <div class="col-lg-4 col-md-6 mb-4">
                   <label for="shipping_zip">Zip</label>
-                  {{ form.shipping_zip }}
-                  <div class="invalid-feedback">
-                    Zip code required.
-                  </div>
+                  <input type="text" placeholder="Zip code" id="shipping_zip" name="shipping_zip" class="form-control" />
+                  <div class="invalid-feedback">Zip code required.</div>
                 </div>
               </div>
 
               <div class="custom-control custom-checkbox">
-                {{ form.same_shipping_address }}
-                <label  for="{{ form.same_shipping_address.id_for_label }}">
-                  Billing address is the same as my shipping address
-                </label>
+                <input type="checkbox" class="custom-control-input" name="same_billing_address" id="same_billing_address">
+                <label class="custom-control-label" for="same_billing_address">Billing address is the same as my shipping address</label>
               </div>
               <div class="custom-control custom-checkbox">
-                {{ form.save_info }}
-                <label for="{{ form.save_info.id_for_label }}">
-                  Save this information for next time
-                </label>
+                <input type="checkbox" class="custom-control-input" name="set_default_shipping" id="set_default_shipping">
+                <label class="custom-control-label" for="set_default_shipping">Save as default shipping address</label>
               </div>
             </div>
 
@@ -66,22 +59,35 @@
             <hr>
 
             <h3>Billing address</h3>
-            <div class='hideable_billing_form'>
+
+            <div class="hideable_billing_form">
+              <div class="md-form mb-5">
+                <input type="text" placeholder="1234 Main St" id="billing_address" name="billing_address" class="form-control" />
+                <label for="billing_address" class="">Address</label>
+              </div>
+
+              <div class="md-form mb-5">
+                <input type="text" placeholder="Apartment or suite" id="billing_address2" name="billing_address2" class="form-control" />
+                <label for="billing_address2" class="">Address 2 (optional)</label>
+              </div>
+
               <div class="row">
                 <div class="col-lg-4 col-md-12 mb-4">
-                  <label for="billing_country">Country</label>
+                  <label for="country">Country</label>
                   {{ form.billing_country }}
-                  <div class="invalid-feedback">
-                    Please select a valid country.
-                  </div>
+                  <div class="invalid-feedback">Please select a valid country.</div>
                 </div>
+
                 <div class="col-lg-4 col-md-6 mb-4">
                   <label for="billing_zip">Zip</label>
-                  {{ form.billing_zip }}
-                  <div class="invalid-feedback">
-                    Zip code required.
-                  </div>
+                  <input type="text" placeholder="Zip code" id="billing_zip" name="billing_zip" class="form-control" />
+                  <div class="invalid-feedback">Zip code required.</div>
                 </div>
+              </div>
+
+              <div class="custom-control custom-checkbox">
+                <input type="checkbox" class="custom-control-input" name="set_default_billing" id="set_default_billing">
+                <label class="custom-control-label" for="set_default_billing">Save as default billing address</label>
               </div>
             </div>
 
@@ -97,8 +103,14 @@
             <hr>
 
             <h3>Payment option</h3>
+
             <div class="d-block my-3">
-              {{ form.payment_option }}
+              {% for value, name in form.fields.payment_option.choices %}
+              <div class="custom-control custom-radio">
+                <input id="{{ name }}" name="payment_option" value="{{ value }}" type="radio" class="custom-control-input" required>
+                <label class="custom-control-label" for="{{ name }}">{{ name }}</label>
+              </div>
+              {% endfor %}
             </div>
 
             <hr class="mb-4">
@@ -118,20 +130,29 @@
 {% block extra_scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  const hideable_shipping_form = document.querySelector('.hideable_shipping_form');
-  const hideable_billing_form = document.querySelector('.hideable_billing_form');
-  const use_default_shipping = document.querySelector('#use_default_shipping');
-  const use_default_billing = document.querySelector('#use_default_billing');
+  var hideable_shipping_form = $('.hideable_shipping_form');
+  var hideable_billing_form = $('.hideable_billing_form');
+
+  var use_default_shipping = document.querySelector("input[name=use_default_shipping]");
+  var use_default_billing = document.querySelector("input[name=use_default_billing]");
 
   if (use_default_shipping) {
     use_default_shipping.addEventListener('change', function() {
-      hideable_shipping_form.style.display = this.checked ? 'none' : 'block';
+      if (this.checked) {
+        hideable_shipping_form.hide();
+      } else {
+        hideable_shipping_form.show();
+      }
     });
   }
 
   if (use_default_billing) {
     use_default_billing.addEventListener('change', function() {
-      hideable_billing_form.style.display = this.checked ? 'none' : 'block';
+      if (this.checked) {
+        hideable_billing_form.hide();
+      } else {
+        hideable_billing_form.show();
+      }
     });
   }
 });

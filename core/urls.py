@@ -10,6 +10,7 @@ from .views import (
     PaymentView , 
     AddCouponView ,
     DeleteCouponView ,
+    RequestRefundView ,
 )
 
 
@@ -26,6 +27,7 @@ urlpatterns = [
     path('add_coupon/',AddCouponView.as_view() , name='add_coupon'),
     path('delete_coupon/',DeleteCouponView.as_view() , name='delete_coupon'),
     path('checkout/',CheckoutView.as_view(), name='checkout'),
+    path('request_refund/',RequestRefundView.as_view() , name='request_refund'),
     re_path(r'^payment/(?P<payment_option>(stripe|paypal))/$', PaymentView.as_view(), name='payment'),
 
 

@@ -12,3 +12,4 @@ installed_packages.txt
 !.travis.yml
 .env
 .vscode
+.codegpt
